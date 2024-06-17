@@ -1,111 +1,40 @@
-const nomes = [
-  "hans peter schmidt",
-  "anna sophie müller",
-  "johann wolfgang schneider",
-  "maria luisa schulz",
-  "thomas andreas hoffmann",
-  "sofia maria wagner",
-  "paul heinrich becker",
-  "emma charlotte koch",
-  "lukas matthias fischer",
-  "lea sophia schwarz",
-  "jonas michael huber",
-  "clara anna krause",
-  "max emil bauer",
-  "lara marie schmidt",
-  "simon lukas hofmann",
-  "helena lena mayer",
-  "felix leon schneider",
-  "julia anna wolf",
-  "benjamin martin schwarz",
-  "mia emilia klein]",
-];
+const teste = "https://www.amazon.com.br/?tag=msndesktopabk-20&ref=pd_sl_7to86bd2ph_e&adgrpid=1141293728081284&hvadid=71331080112049&hvnetw=o&hvqmt=e&hvbmt=be&hvdev=c&hvlocint=&hvlocphy=147001&hvtargid=kwd-71331371436168:loc-20&hydadcr=26346_11803856&msclkid=5bfd8417ecf7144efb22e2678cd76ec9";
 
-const emails = [];
+describe("Teste compra na Amazon", () => {
+  it("Deverá fazer um fluxo de compra e desistência de compra na Amazon", () => {  
+    //IR PARA A AMAZON
+    cy.log('Ir para o site da Amazon.');
+    cy.visit(teste);
 
-nomes.forEach((element) => {
-  const nomeCompleto = element;
-  const [nome, ...sobrenome] = nomeCompleto.split(" ");
-  const email =
-    nome.replace(/\s+/g, ".") +
-    "." +
-    sobrenome.join(".") +
-    Math.round(Math.random() * 100);
-  emails[nomeCompleto] = email;
-});
+    //ADICIONAR UM ITEM AO CARRINHO
+    cy.log('Adicionar um item ao carrinho.');
+    cy.get('#twotabsearchtextbox').type('Biscoito {enter}');
+    // cy.get('#nav-search-submit-button').click()
+    cy.get('[data-index="3"] > .sg-col-inner > .s-widget-container > [data-component-type="s-impression-logger"] > .s-featured-result-item > [data-action="puis-card-container-declarative"] > .puis-card-container > .a-spacing-base > .a-spacing-small > [data-cy="title-recipe"] > .a-size-mini > .a-link-normal > .a-size-base-plus').click();
+    cy.get('#a-autoid-0-announce').click();
+    cy.get('#quantity_0').click();
+    cy.get('#add-to-cart-button').click()
 
-let indice = Math.floor(Math.random()*100/5-1)
-console.log(indice)
-console.log(emails);
+    //FAZER MAIS UMA ADIÇÃO AO CARRINHO
+    cy.log('Fazer mais uma adição ao carrinho.');
+    cy.get('#twotabsearchtextbox').type('Livros {enter}');
+    cy.get('[data-asin="6584956245"] > .sg-col-inner > .s-widget-container > [data-action="puis-card-container-declarative"] > .puis-card-container > .a-spacing-base > .s-product-image-container > .rush-component > .a-link-normal > .a-section > .s-image').click();
+    cy.get('#a-autoid-4-announce').click();
+    cy.get('#quantity_3').click();
+    cy.get('#add-to-cart-button').click();
 
-const link =
-  "https://accounts.google.com/v3/signin/identifier?authuser=0&continue=https%3A%2F%2Fwww.google.com%2Fsearch%3Fq%3Dlogin%2Bgoogle%26rlz%3D1C1GCEU_pt-BRBR1098BR1098%26oq%3Dlogin%26gs_lcrp%3DEgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTIRCAEQRRg5GEMYsQMYgAQYigUyBggCEEUYQDIGCAMQRRg8MgYIBBBFGEEyBggFEEUYPDIGCAYQRRg8MgYIBxBFGDzSAQgxMjc5ajBqN6gCALACAA%26sourceid%3Dchrome%26ie%3DUTF-8%26safe%3Dactive%26ssui%3Don&ec=futura_gmv_dt_si_72586115_e&hl=pt-BR&flowName=GlifWebSignIn&flowEntry=AddSession&dsh=S521048960%3A1718392446246089&ddm=0";
-describe("template spec", () => {
-  Cypress.on("uncaught:exception", (err, runnable) => {
-    if (
-      err.message.includes(
-        "ResizeObserver loop completed with undelivered notifications"
-      )
-    ) {
-      return false;
-    }
-    return true;
-  });
-  it("O teste foi bem executado", () => {
-    // Ignorar o erro "ResizeObserver loop completed with undelivered notifications"
-    
-    cy.visit(link);
-    cy.contains("Criar conta").click();
+    //IR PARA O CARRINHO
+    cy.log('Ir ao carrinho.');
+    cy.get('#sw-gtc > .a-button-inner > .a-button-text').click();
 
-    // verificar se existe o elemento
-    cy.get("body").then(($body) => {
-      // Verifique se algum elemento com a classe '.special-item' está presente no DOM
-      if ($body.find(".gNVsKb ").length > 0) {
-        cy.log("Porra");
-        // Se a classe estiver presente, clique no primeiro botão da lista
-        cy.contains("Para uso pessoal").first().click();
-      } else {
-        // A classe não está presente, registre um log
-        cy.log("Elemento '.special-item' não encontrado, ação não executada.");
-      }
-    });
 
-    cy.get('input[name="firstName"]')
-      .should("be.visible")
-      .should("be.enabled")
-      .type(nomes[indice]);
+    //MUDAR A QUANTIDADE DE UM DOS ITENS
+    cy.log('Mudar a quantia de um dos itens.');
+    cy.get('#a-autoid-0-announce').click();
+    cy.get('#quantity_1').click();
 
-    /* cy.get('input[name="lastName"]')
-      .should("be.visible")
-      .should("be.enabled")
-      .type("Sicrano"); */
-    cy.contains("Avançar").click();
-
-    cy.get(".whsOnd").first().type("12");
-
-    //selecionar mês
-    cy.get(".gNnnTd").first().should("have.value", "");
-    cy.get(".gNnnTd").first().select("1").should("have.value", "1");
-
-    cy.get("#year").first().type("2000");
-    //selecionar gênero
-    cy.get("#gender").first().should("have.value", "");
-    cy.get("#gender").first().select("3").should("have.value", "3");
-
-    cy.contains("Avançar").click();
-
-    // Verifica se o elemento contém o texto "Crie seu próprio endereço do Gmail"
-    cy.contains("Crie seu próprio endereço do Gmail").then(($element) => {
-      if ($element.length > 0) {
-        cy.log('Elemento "Crie seu próprio endereço do Gmail" encontrado');
-        $element.click();
-        cy.get('input[name="Username"]').type(emails[nomeCompleto]);
-      } else {
-        cy.log(
-          "Elemento 'Crie seu próprio endereço do Gmail' não encontrado, procurando pelo campo 'Nome de usuário'"
-        );
-        cy.get('input[name="Username"]').type(emails[nomeCompleto]);
-      }
-    });
-  });
+    //FECHAR PEDIDO
+    cy.log('Fechar Pedido(Não serão feitos os processos de login, este passo é apenas figurativo.)');
+    cy.get('#sc-buy-box-ptc-button > .a-button-inner > .a-button-input').click();
+  })
 });
